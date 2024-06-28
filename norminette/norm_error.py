@@ -1,4 +1,6 @@
-errors = {
+from norminette.colors import red, blue, yellow, pink, grey, green
+
+errors = {  
     "SPC_INSTEAD_TAB": "Spaces at beginning of line",
     "TAB_INSTEAD_SPC": "Found tab when expecting space",
     "CONSECUTIVE_SPC": "Two or more consecutives spaces",
@@ -122,34 +124,62 @@ digits or '_'",
     "FORBIDDEN_STRUCT": "Struct declaration are not allowed in .c files",
     "FORBIDDEN_UNION": "Union declaration are not allowed in .c files",
     "FORBIDDEN_ENUM": "Enum declaration are not allowed in .c files",
+    "UNEXPECTED_EOF_CHR": "Unexpected end of file (EOF) while parsing a char",
+    "UNEXPECTED_EOL_CHR": "Unexpected end of line (EOL) while parsing a char",
+    "UNEXPECTED_EOF_MC": "Unexpected end of file (EOF) while parsing a multiline comment",
+    "UNEXPECTED_EOF_STR": "Unexpected end of file (EOF) while parsing a string",
+    "EMPTY_CHAR": "Empty character constant",
+    "CHAR_AS_STRING": "Character constants can have only one character",
+    "INVALID_SUFFIX": "This suffix is invalid",
+    "BAD_FLOAT_SUFFIX": "Invalid suffix for float/double literal constant",
+    "INVALID_BIN_INT": "Invalid binary integer literal",
+    "INVALID_OCT_INT": "Invalid octal integer literal",
+    "INVALID_HEX_INT": "Invalid hexadecimal integer literal",
+    "MAXIMAL_MUNCH": "Potential maximal munch detected",
+    "NO_HEX_DIGITS": "No hexadecimal digits followed by the \\x",
+    "UNKNOWN_ESCAPE": "Unknown escape sequence",
+    "BAD_EXPONENT": "Exponent has no digits",
+    "MULTIPLE_DOTS": "Multiple dots in float constant",
+    "MULTIPLE_X": "Multiple 'x' in hexadecimal float constant",
 }
 
 
 class NormError:
-    def __init__(self, errno, line, col=None):
+    def __init__(self, errno, line, col):
         self.errno = errno
         self.line = line
         self.col = col
-        if col is not None:
-            self.error_pos = f"(line: {(str(self.line)).rjust(3)}, col: {(str(self.col)).rjust(3)}):\t"
-        else:
-            self.error_pos = f"(line: {(str(self.line)).rjust(3)}):\t "
+        self.error_pos = f"(line: {(str(self.line)).rjust(3)}, col: {(str(self.col)).rjust(3)}):\t"
         self.prefix = f"Error: {self.errno:<20} {self.error_pos:>21}"
         self.error_msg = f"{errors.get(self.errno, 'ERROR NOT FOUND')}"
+        self.no_color = "\033[0m"
+        self.color = self.no_color
+        color = {
+                "\033[91m":red,
+                "\033[92m":green,
+                "\033[93m":yellow,
+                "\033[94m":blue,
+                "\033[95m":pink,
+                "\033[97m":grey,
+        }
+        for key,value in color.items():
+            if errno in value:
+                self.color = key
+                break
+        self.prefix = self.prefix
+        self.error_msg = self.color + self.error_msg + self.no_color
 
     def __str__(self):
         return self.prefix + self.error_msg
 
 
+
 class NormWarning:
-    def __init__(self, errno, line, col=None):
+    def __init__(self, errno, line, col):
         self.errno = errno
         self.line = line
         self.col = col
-        if col is not None:
-            self.error_pos = f"(line: {(str(self.line)).rjust(3)}, col: {(str(self.col)).rjust(3)}):\t"
-        else:
-            self.error_pos = f"(line: {(str(self.line)).rjust(3)}):\t "
+        self.error_pos = f"(line: {(str(self.line)).rjust(3)}, col: {(str(self.col)).rjust(3)}):\t"
         self.prefix = f"Notice: {self.errno:<20} {self.error_pos:>21}"
         self.error_msg = f"{errors.get(self.errno, 'WARNING NOT FOUND')}"
 

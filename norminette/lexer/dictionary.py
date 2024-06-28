@@ -1,5 +1,25 @@
 """ Dictionary that correlates lexeme with token """
 
+trigraphs = {
+    "??<": '{',
+    "??>": '}',
+    "??(": '[',
+    "??)": ']',
+    "??=": '#',
+    "??/": '\\',
+    "??'": '^',
+    "??!": '|',
+    "??-": '~',
+}
+
+digraphs = {
+    "<%": '{',
+    "%>": '}',
+    "<:": '[',
+    ":>": ']',
+    "%:": '#',
+}
+
 keywords = {
     # C reserved keywords #
     "auto": "AUTO",
@@ -88,6 +108,7 @@ operators = {
     ">>": "RIGHT_SHIFT",
     "<<": "LEFT_SHIFT",
     "?": "TERN_CONDITION",
+    "#": "HASH",
 }
 
 brackets = {
